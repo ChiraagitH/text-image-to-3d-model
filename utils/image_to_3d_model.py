@@ -30,20 +30,18 @@ def process_image(image_path, output_path="output/image_model.obj"):
     xyz = np.stack((xx, yy, depth_map), axis=-1).reshape(-1, 3)
     colors = img.reshape(-1, 3) / 255.0
 
-    # Remove zero-depth points
+    
     mask = depth_map.flatten() > 0
     xyz = xyz[mask]
     colors = colors[mask]
 
-    # Create point cloud
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(xyz)
     pcd.colors = o3d.utility.Vector3dVector(colors)
 
-    # Estimate mesh from point cloud
     mesh, _ = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=8)
     mesh.compute_vertex_normals()
 
-    # Save mesh
+    
     o3d.io.write_triangle_mesh(output_path, mesh)
     return output_path
